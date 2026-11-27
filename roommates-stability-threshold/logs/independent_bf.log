@@ -1,0 +1,13 @@
+N=3 involutions=4 profiles=8
+ threshold 1: 6 profiles
+ threshold 2: 2 profiles
+ K(3)=2
+N=4 involutions=10 profiles=1296
+ threshold 1: 1248 profiles
+ threshold 2: 48 profiles
+ K(4)=2
+N=5 involutions=26 profiles=7962624
+ threshold 1: 4694400 profiles
+ threshold 2: 3268104 profiles
+ threshold 3: 120 profiles
+ K(5)=3

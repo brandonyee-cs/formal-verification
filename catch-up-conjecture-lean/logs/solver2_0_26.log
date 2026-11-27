@@ -1,0 +1,26 @@
+N=0 T=0 T_even=1 value=draw states=0 CONJ_OK
+N=1 T=1 T_even=0 value=win states=0 
+N=2 T=3 T_even=0 value=win states=1 
+N=3 T=6 T_even=1 value=draw states=6 CONJ_OK
+N=4 T=10 T_even=1 value=draw states=17 CONJ_OK
+N=5 T=15 T_even=0 value=win states=31 
+N=6 T=21 T_even=0 value=win states=86 
+N=7 T=28 T_even=1 value=draw states=299 CONJ_OK
+N=8 T=36 T_even=1 value=draw states=744 CONJ_OK
+N=9 T=45 T_even=0 value=loss states=1514 
+N=10 T=55 T_even=0 value=loss states=3536 
+N=11 T=66 T_even=1 value=draw states=9514 CONJ_OK
+N=12 T=78 T_even=1 value=draw states=21495 CONJ_OK
+N=13 T=91 T_even=0 value=win states=44199 
+N=14 T=105 T_even=0 value=loss states=97221 
+N=15 T=120 T_even=1 value=draw states=230407 CONJ_OK
+N=16 T=136 T_even=1 value=draw states=498905 CONJ_OK
+N=17 T=153 T_even=0 value=win states=1038664 
+N=18 T=171 T_even=0 value=loss states=2225124 
+N=19 T=190 T_even=1 value=draw states=4875061 CONJ_OK
+N=20 T=210 T_even=1 value=draw states=10319982 CONJ_OK
+N=21 T=231 T_even=0 value=win states=21501200 
+N=22 T=253 T_even=0 value=win states=45355975 
+N=23 T=276 T_even=1 value=draw states=95871145 CONJ_OK
+N=24 T=300 T_even=1 value=draw states=200426886 CONJ_OK
+N=25 T=325 T_even=0 value=win states=416436902 

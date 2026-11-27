@@ -1,0 +1,11 @@
+⚠ [8989/8991] Built RoommatesThreshold.Results (16s)
+warning: RoommatesThreshold/Results.lean:300:8: This simp argument is unused:
+  this
+
+Hint: Omit it from the simp argument list.
+  [apply] simp [hc]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+✔ [8990/8991] Built RoommatesThreshold (8.2s)
+Build completed successfully (8991 jobs).
+lake build  39.37s user 9.24s system 123% cpu 39.281 total

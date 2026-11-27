@@ -1,0 +1,21 @@
+PROFILE | 1 2 | 2 0 | 0 1
+N=3 k=1 matchings=4 leaves=4 no_k_stable_profiles=1
+N=3 k=2 matchings=4 leaves=4 no_k_stable_profiles=0
+N=3 k=3 matchings=4 leaves=4 no_k_stable_profiles=0
+PROFILE | 1 2 3 | 2 0 3 | 0 1 3 | 0 1 2
+N=4 k=1 matchings=10 leaves=216 no_k_stable_profiles=8
+N=4 k=2 matchings=10 leaves=216 no_k_stable_profiles=0
+N=4 k=3 matchings=10 leaves=216 no_k_stable_profiles=0
+PROFILE | 1 2 3 4 | 0 2 3 4 | 0 1 3 4 | 0 1 4 2 | 0 1 2 3
+PROFILE | 1 2 3 4 | 0 2 3 4 | 0 1 3 4 | 0 1 4 2 | 0 2 1 3
+PROFILE | 1 2 3 4 | 0 2 3 4 | 0 1 3 4 | 0 1 4 2 | 0 2 3 1
+PROFILE | 1 2 3 4 | 0 2 3 4 | 0 1 3 4 | 0 1 4 2 | 1 0 2 3
+PROFILE | 1 2 3 4 | 0 2 3 4 | 0 1 3 4 | 0 1 4 2 | 1 2 0 3
+N=5 k=1 matchings=26 leaves=331776 no_k_stable_profiles=136176
+PROFILE | 1 2 3 4 | 0 3 2 4 | 3 1 4 0 | 4 0 2 1 | 2 1 3 0
+PROFILE | 1 2 3 4 | 0 3 2 4 | 4 1 3 0 | 2 0 4 1 | 3 0 2 1
+PROFILE | 1 2 3 4 | 3 2 0 4 | 4 3 1 0 | 0 4 1 2 | 2 1 3 0
+PROFILE | 1 2 3 4 | 3 4 0 2 | 4 1 0 3 | 0 2 1 4 | 2 0 1 3
+PROFILE | 1 2 3 4 | 3 4 0 2 | 4 3 0 1 | 0 4 1 2 | 2 0 3 1
+N=5 k=2 matchings=26 leaves=331776 no_k_stable_profiles=5
+N=5 k=3 matchings=26 leaves=331776 no_k_stable_profiles=0

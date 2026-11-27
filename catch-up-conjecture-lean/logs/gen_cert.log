@@ -1,0 +1,17 @@
+# Regeneration of lean/CatchUpLean/Cert.lean from scripts/cert.cpp and lean/CertLib.lean.part.
+$ g++ -O2 -o scripts/cert scripts/cert.cpp
+$ python3 -I scripts/gen_cert_lean.py Cert_regen.lean 300 0 3 4 7 8 11 12 15 16
+N=0 ge_draw=1 ge_win=0 certsize=2 memo=0
+N=3 ge_draw=1 ge_win=0 certsize=12 memo=10
+N=4 ge_draw=1 ge_win=0 certsize=19 memo=18
+N=7 ge_draw=1 ge_win=0 certsize=82 memo=101
+N=8 ge_draw=1 ge_win=0 certsize=133 memo=172
+N=11 ge_draw=1 ge_win=0 certsize=502 memo=685
+N=12 ge_draw=1 ge_win=0 certsize=799 memo=1137
+N=15 ge_draw=1 ge_win=0 certsize=2818 memo=4176
+N=16 ge_draw=1 ge_win=0 certsize=4418 memo=6740
+wrote Cert_regen.lean
+$ cmp Cert_regen.lean lean/CatchUpLean/Cert.lean && echo IDENTICAL
+IDENTICAL
+$ sha256sum lean/CatchUpLean/Cert.lean
+ac3fffcf2021116f55ace10690c6cfb17042a043bcc9b4c3651881767c540828  lean/CatchUpLean/Cert.lean

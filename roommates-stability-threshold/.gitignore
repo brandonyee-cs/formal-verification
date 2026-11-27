@@ -1,0 +1,12 @@
+__pycache__/
+*.pyc
+lean/.lake/
+# large SAT artifacts (regenerate with scripts/satgen.py / satsolve.py)
+*.cnf
+*.cnf.map
+*.lrat
+*.drat
+# compiled binaries
+scripts/search
+scripts/anneal
+independent-checks/bf

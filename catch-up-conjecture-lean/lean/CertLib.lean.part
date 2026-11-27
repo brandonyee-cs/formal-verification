@@ -1,0 +1,267 @@
+import FormalConjectures.Paper.CatchUpConjecture
+
+/-! Certificate checker for Catch-Up draws, proved sound against `CatchUp.valueAux`.
+A certificate is a binary search tree of claims `(key, v)`; each key decodes to a position
+(remaining list, deficit g, threshold w) and the claim says `thr w (D ...) = v`.
+The checker verifies every claim locally from the claims of its children. -/
+
+namespace CatchUpCert
+open CatchUp
+
+theorem best_eq (os : List Outcome) : Outcome.best os =
+    if Outcome.win ∈ os then .win else if Outcome.draw ∈ os then .draw else .loss := by
+  unfold Outcome.best
+  induction os using List.reverseRecOn with
+  | nil => simp
+  | append_singleton l o ih =>
+    rw [List.foldl_append, ih]
+    simp only [List.foldl_cons, List.foldl_nil, List.mem_append, List.mem_singleton]
+    by_cases hw : Outcome.win ∈ l <;> by_cases hd : Outcome.draw ∈ l <;> cases o <;> simp [hw, hd]
+
+theorem best_congr {os os' : List Outcome} (h : ∀ o, o ∈ os ↔ o ∈ os') :
+    Outcome.best os = Outcome.best os' := by
+  simp only [best_eq, h]
+
+/-- Value of a non-first position: mover is behind by `g`, remaining numbers `l`. -/
+def D : ℕ → List ℕ → ℕ → Outcome
+  | 0, l, g => if l = [] then (if g = 0 then .draw else .loss) else .loss
+  | n+1, l, g =>
+    if l = [] then (if g = 0 then .draw else .loss) else
+    if l.sum < g then .loss else
+    Outcome.best (l.map fun x =>
+      if g ≤ x then (D n (l.erase x) (x - g)).neg else D n (l.erase x) (g - x))
+
+theorem valueAux_eq_D (n : ℕ) : ∀ (l : List ℕ) (a b : ℕ) (f : Bool),
+    l.Nodup → l.length ≤ n → a ≤ b → (f = true → a = b) →
+    valueAux l.toFinset a b f = D n l (b - a) := by
+  induction n with
+  | zero =>
+    intro l a b f _ hl hab _
+    have : l = [] := List.eq_nil_of_length_eq_zero (by omega)
+    subst this
+    rw [valueAux]
+    simp only [List.toFinset_nil, if_true, D]
+    split_ifs <;> first | rfl | omega
+  | succ n ih =>
+    intro l a b f hnd hl hab hf
+    rw [valueAux]
+    by_cases h0 : l = []
+    · subst h0
+      simp only [List.toFinset_nil, if_true, D]
+      split_ifs <;> first | rfl | omega
+    · have hne : l.toFinset ≠ ∅ := by simpa [List.toFinset_eq_empty_iff] using h0
+      have hsum : l.toFinset.sum (fun x => x) = l.sum := by
+        rw [List.sum_toFinset _ hnd]; simp
+      simp only [hne, if_false, D, h0, hsum]
+      by_cases hlt : a + l.sum < b
+      · have : l.sum < b - a := by omega
+        simp only [hlt, this, if_true]
+      · have : ¬ l.sum < b - a := by omega
+        rw [if_neg hlt, if_neg this]
+        apply best_congr
+        intro o
+        have hx : ∀ x ∈ l, (l.toFinset.erase x) = (l.erase x).toFinset := by
+          intro x _; ext y; simp [hnd.mem_erase_iff]
+        have hlen : ∀ x ∈ l, (l.erase x).length ≤ n := by
+          intro x hx; rw [List.length_erase_of_mem hx]; omega
+        have key : ∀ x ∈ l,
+            (if f = true then (valueAux (l.toFinset.erase x) b (a + x) false).neg
+             else if a + x ≥ b then (valueAux (l.toFinset.erase x) b (a + x) false).neg
+             else valueAux (l.toFinset.erase x) (a + x) b false) =
+            (if b - a ≤ x then (D n (l.erase x) (x - (b - a))).neg
+             else D n (l.erase x) (b - a - x)) := by
+          intro x hxl
+          rw [hx x hxl]
+          by_cases hfx : f = true
+          · have hab' := hf hfx
+            rw [if_pos hfx, if_pos (by omega),
+              ih _ _ _ _ (hnd.erase x) (hlen x hxl) (by omega) (by simp)]
+            congr 2; omega
+          · rw [if_neg hfx]
+            by_cases hc : a + x ≥ b
+            · rw [if_pos hc, if_pos (by omega),
+                ih _ _ _ _ (hnd.erase x) (hlen x hxl) (by omega) (by simp)]
+              congr 2; omega
+            · rw [if_neg hc, if_neg (by omega),
+                ih _ _ _ _ (hnd.erase x) (hlen x hxl) (by omega) (by simp)]
+              congr 1; omega
+        simp only [List.mem_map, Finset.mem_toList, Finset.mem_attach, true_and, Subtype.exists,
+          List.mem_toFinset]
+        constructor
+        · rintro ⟨x, hxl, rfl⟩
+          exact ⟨x, hxl, (key x hxl).symm⟩
+        · rintro ⟨x, hxl, rfl⟩
+          exact ⟨x, hxl, key x hxl⟩
+
+/-- Threshold test: `thr true o` iff `o = win`; `thr false o` iff `o ≠ loss`. -/
+def thr : Bool → Outcome → Bool
+  | true, .win => true
+  | true, _ => false
+  | false, .loss => false
+  | false, _ => true
+
+theorem thr_neg (w : Bool) (o : Outcome) : thr w o.neg = !(thr (!w) o) := by
+  cases w <;> cases o <;> rfl
+
+theorem any_thr_false (os : List Outcome) :
+    os.any (thr false) = (decide (Outcome.win ∈ os) || decide (Outcome.draw ∈ os)) := by
+  induction os with
+  | nil => rfl
+  | cons o os ih => cases o <;> simp [List.any_cons, thr, ih]
+
+theorem any_thr_true (os : List Outcome) :
+    os.any (thr true) = decide (Outcome.win ∈ os) := by
+  induction os with
+  | nil => rfl
+  | cons o os ih => cases o <;> simp [List.any_cons, thr, ih]
+
+theorem thr_best (w : Bool) (os : List Outcome) : thr w (Outcome.best os) = os.any (thr w) := by
+  rw [best_eq]
+  cases w
+  · rw [any_thr_false]; split_ifs <;> simp_all [thr]
+  · rw [any_thr_true]; split_ifs <;> simp_all [thr]
+
+/-- Claim tree. -/
+inductive Tr
+  | nil
+  | node (l : Tr) (k : ℕ) (v : Bool) (r : Tr)
+
+def Tr.find : Tr → ℕ → Option Bool
+  | .nil, _ => none
+  | .node l k v r, q => if q < k then l.find q else if k < q then r.find q else some v
+
+def Tr.all (p : ℕ → Bool → Bool) : Tr → Bool
+  | .nil => true
+  | .node l k v r => p k v && l.all p && r.all p
+
+theorem Tr.find_sound (p : ℕ → Bool → Bool) : ∀ (t : Tr) (q : ℕ) (v : Bool),
+    t.all p = true → t.find q = some v → p q v = true := by
+  intro t
+  induction t with
+  | nil => intro q v _ h; simp [Tr.find] at h
+  | node l k v' r ihl ihr =>
+    intro q v hall hf
+    simp only [Tr.all, Bool.and_eq_true] at hall
+    simp only [Tr.find] at hf
+    split_ifs at hf with h1 h2
+    · exact ihl q v hall.1.2 hf
+    · exact ihr q v hall.2 hf
+    · have : q = k := by omega
+      subst this; cases hf; exact hall.1.1
+
+def mask (l : List ℕ) : ℕ := (l.map (2 ^ ·)).sum
+
+def enc (l : List ℕ) (g : ℕ) (w : Bool) : ℕ := (mask l * 1024 + g) * 2 + (if w then 1 else 0)
+
+def dec (N k : ℕ) : List ℕ × ℕ × Bool :=
+  ((List.range' 1 N).filter (fun x => (k / 2048).testBit x), (k / 2) % 1024, k % 2 == 1)
+
+def look (N : ℕ) (T : Tr) (l : List ℕ) (g : ℕ) (w : Bool) : Option Bool :=
+  if dec N (enc l g w) = (l, g, w) then T.find (enc l g w) else none
+
+def child (N : ℕ) (T : Tr) (l : List ℕ) (g : ℕ) (w : Bool) (x : ℕ) : Option Bool :=
+  if g ≤ x then (look N T (l.erase x) (x - g) (!w)).map (!·) else look N T (l.erase x) (g - x) w
+
+def checkState (N : ℕ) (T : Tr) (l : List ℕ) (g : ℕ) (w v : Bool) : Bool :=
+  if l = [] then v == thr w (if g = 0 then .draw else .loss)
+  else if l.sum < g then v == false
+  else if v then l.any (fun x => child N T l g w x == some true)
+  else l.all (fun x => child N T l g w x == some false)
+
+def checkNode (N : ℕ) (T : Tr) (k : ℕ) (v : Bool) : Bool :=
+  checkState N T (dec N k).1 (dec N k).2.1 (dec N k).2.2 v
+
+/-- Semantics of a claim. -/
+def Sem (l : List ℕ) (g : ℕ) (w v : Bool) : Prop := thr w (D l.length l g) = v
+
+theorem check_sound (N : ℕ) (T : Tr) (hT : T.all (checkNode N T) = true) :
+    ∀ n, ∀ (l : List ℕ) (g : ℕ) (w v : Bool), l.length = n → look N T l g w = some v →
+      Sem l g w v := by
+  intro n
+  induction n with
+  | zero =>
+    intro l g w v hl hlook
+    have hl0 : l = [] := List.eq_nil_of_length_eq_zero hl
+    subst hl0
+    unfold look at hlook
+    split_ifs at hlook with hd
+    have hc := Tr.find_sound _ T _ _ hT hlook
+    simp only [checkNode, hd, checkState, if_true, beq_iff_eq] at hc
+    unfold Sem
+    rw [hc]
+    simp only [List.length_nil, D, if_true]
+  | succ m ih =>
+    intro l g w v hl hlook
+    unfold look at hlook
+    split_ifs at hlook with hd
+    have hc := Tr.find_sound _ T _ _ hT hlook
+    simp only [checkNode, hd] at hc
+    have h0 : l ≠ [] := by intro h; subst h; simp at hl
+    unfold Sem
+    rw [hl]
+    simp only [checkState, h0, if_false] at hc
+    simp only [D, h0, if_false]
+    by_cases hs : l.sum < g
+    · simp only [hs, if_true, beq_iff_eq] at hc ⊢
+      rw [hc]; cases w <;> rfl
+    · simp only [hs, if_false] at hc ⊢
+      rw [thr_best]
+      -- each child claim is semantically correct
+      have hchild : ∀ x ∈ l, ∀ c, child N T l g w x = some c →
+          thr w (if g ≤ x then (D m (l.erase x) (x - g)).neg else D m (l.erase x) (g - x)) = c := by
+        intro x hx c hcx
+        have hlen : (l.erase x).length = m := by rw [List.length_erase_of_mem hx]; omega
+        unfold child at hcx
+        split_ifs at hcx with hgx
+        · cases hl' : look N T (l.erase x) (x - g) (!w) with
+          | none => rw [hl'] at hcx; cases hcx
+          | some c' =>
+            rw [hl'] at hcx
+            simp only [Option.map_some, Option.some.injEq] at hcx
+            have := ih _ _ _ _ hlen hl'
+            unfold Sem at this
+            rw [hlen] at this
+            rw [if_pos hgx, thr_neg, this, ← hcx]
+        · have := ih _ _ _ _ hlen hcx
+          unfold Sem at this
+          rw [hlen] at this
+          rw [if_neg hgx]
+          exact this
+      cases v
+      · simp only [Bool.false_eq_true, if_false, List.all_eq_true, beq_iff_eq] at hc
+        rw [List.any_eq_false]
+        intro o ho
+        simp only [List.mem_map] at ho
+        obtain ⟨x, hx, rfl⟩ := ho
+        rw [hchild x hx false (hc x hx)]
+        simp
+      · simp only [if_true, List.any_eq_true, beq_iff_eq] at hc
+        obtain ⟨x, hx, hcx⟩ := hc
+        rw [List.any_eq_true]
+        exact ⟨_, List.mem_map_of_mem hx, hchild x hx true hcx⟩
+
+theorem Icc_eq (N : ℕ) : Finset.Icc 1 N = (List.range' 1 N).toFinset := by
+  ext y; simp only [Finset.mem_Icc, List.mem_toFinset, List.mem_range'_1]; omega
+
+theorem value_eq_D (N : ℕ) : value (Finset.Icc 1 N) = D N (List.range' 1 N) 0 := by
+  rw [value, Icc_eq]
+  exact valueAux_eq_D N _ _ _ _ List.nodup_range' (by simp) le_rfl (fun _ => rfl)
+
+/-- Main reduction: a checked certificate containing the two root claims proves the draw. -/
+theorem value_eq_draw_of_cert (N : ℕ) (T : Tr) (hT : T.all (checkNode N T) = true)
+    (h1 : look N T (List.range' 1 N) 0 false = some true)
+    (h2 : look N T (List.range' 1 N) 0 true = some false) :
+    value (Finset.Icc 1 N) = .draw := by
+  have s1 := check_sound N T hT _ _ _ _ _ rfl h1
+  have s2 := check_sound N T hT _ _ _ _ _ rfl h2
+  unfold Sem at s1 s2
+  rw [List.length_range'] at s1 s2
+  rw [value_eq_D]
+  revert s1 s2
+  cases D N (List.range' 1 N) 0 <;> simp [thr]
+
+theorem Tr.all_node_intro {p : ℕ → Bool → Bool} {l r : Tr} {k : ℕ} {v : Bool}
+    (h : p k v = true) (hl : l.all p = true) (hr : r.all p = true) :
+    (Tr.node l k v r).all p = true := by
+  simp [Tr.all, h, hl, hr]
+

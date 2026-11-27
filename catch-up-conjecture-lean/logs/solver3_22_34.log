@@ -1,0 +1,11 @@
+N=22 T=253 value=win  secs=1
+N=23 T=276 value=draw CONJ_OK secs=1
+N=24 T=300 value=draw CONJ_OK secs=1
+N=25 T=325 value=win  secs=17
+N=26 T=351 value=win  secs=38
+N=27 T=378 value=draw CONJ_OK secs=1
+N=28 T=406 value=draw CONJ_OK secs=4
+N=29 T=435 value=win  secs=64
+N=30 T=465 value=win  secs=108
+N=31 T=496 value=draw CONJ_OK secs=5
+N=32 T=528 value=draw CONJ_OK secs=6

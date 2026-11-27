@@ -1,0 +1,4 @@
+# independent-checks/count.py on scripts/satgen.py CNFs (nobreak), projected model counts
+N=3 k=1 projected models: 2
+N=4 k=1 projected models: 48
+N=5 k=2 projected models: 120

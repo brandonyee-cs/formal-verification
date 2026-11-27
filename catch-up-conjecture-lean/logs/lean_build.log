@@ -1,0 +1,53 @@
+# Build of the fresh lean/ project. Package checkouts (Mathlib and its dependencies, and a clean checkout of formal-conjectures at 9097e2f9 with its existing build outputs) were copied into .lake/packages beforehand, so only CatchUpLean was compiled. Eval and Parity were built first, then the whole library (Cert took 275 s; sampled peak RSS of the lean process about 9.2 GB).
+$ lake build CatchUpLean.Eval CatchUpLean.Parity
+info: CatchUpLean: no previous manifest, creating one from scratch
+info: toolchain not updated; already up-to-date
+info: mathlib: running post-update hooks
+Current branch: HEAD
+Using cache from origin: (some leanprover-community/mathlib4)
+No files to download
+Already decompressed 8690 file(s)
+⚠ [8989/8990] Built CatchUpLean.Parity (120s)
+warning: CatchUpLean/Parity.lean:21:48: Used `tac1 <;> tac2` where `(tac1; tac2)` would suffice
+
+Note: This linter can be disabled with `set_option linter.unnecessarySeqFocus false`
+⚠ [8990/8990] Built CatchUpLean.Eval (186s)
+warning: CatchUpLean/Eval.lean:3:0: This file has no module docstring (`/-! ... -/`). Add one after the imports to document the file.
+
+Note: This linter can be disabled with `set_option linter.style.moduleDocstring false`
+warning: CatchUpLean/Eval.lean:4:0: This file has no module docstring (`/-! ... -/`). Add one after the imports to document the file.
+
+Note: This linter can be disabled with `set_option linter.style.moduleDocstring false`
+warning: CatchUpLean/Eval.lean:125:74: Used `tac1 <;> tac2` where `(tac1; tac2)` would suffice
+
+Note: This linter can be disabled with `set_option linter.unnecessarySeqFocus false`
+warning: CatchUpLean/Eval.lean:130:74: Used `tac1 <;> tac2` where `(tac1; tac2)` would suffice
+
+Note: This linter can be disabled with `set_option linter.unnecessarySeqFocus false`
+Build completed successfully (8990 jobs).
+lake build CatchUpLean.Eval CatchUpLean.Parity  90.45s user 46.09s system 57% cpu 3:55.94 total
+exit=0
+
+$ lake build
+⚠ [8989/8993] Replayed CatchUpLean.Eval
+warning: CatchUpLean/Eval.lean:3:0: This file has no module docstring (`/-! ... -/`). Add one after the imports to document the file.
+
+Note: This linter can be disabled with `set_option linter.style.moduleDocstring false`
+warning: CatchUpLean/Eval.lean:4:0: This file has no module docstring (`/-! ... -/`). Add one after the imports to document the file.
+
+Note: This linter can be disabled with `set_option linter.style.moduleDocstring false`
+warning: CatchUpLean/Eval.lean:125:74: Used `tac1 <;> tac2` where `(tac1; tac2)` would suffice
+
+Note: This linter can be disabled with `set_option linter.unnecessarySeqFocus false`
+warning: CatchUpLean/Eval.lean:130:74: Used `tac1 <;> tac2` where `(tac1; tac2)` would suffice
+
+Note: This linter can be disabled with `set_option linter.unnecessarySeqFocus false`
+⚠ [8990/8993] Replayed CatchUpLean.Parity
+warning: CatchUpLean/Parity.lean:21:48: Used `tac1 <;> tac2` where `(tac1; tac2)` would suffice
+
+Note: This linter can be disabled with `set_option linter.unnecessarySeqFocus false`
+✔ [8991/8993] Built CatchUpLean.Cert (275s)
+✔ [8992/8993] Built CatchUpLean (6.4s)
+Build completed successfully (8993 jobs).
+lake build  254.38s user 21.47s system 88% cpu 5:12.74 total
+exit=0

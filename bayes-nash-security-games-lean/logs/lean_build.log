@@ -1,0 +1,25 @@
+# First build (fresh lean/ project; package checkouts copied in, Mathlib cache fetched by lake; download progress lines removed)
+$ lake build
+info: BayesNashSecurityGames: no previous manifest, creating one from scratch
+info: toolchain not updated; already up-to-date
+info: mathlib: running post-update hooks
+Current branch: HEAD
+Using cache from origin: (some leanprover-community/mathlib4)
+Attempting to download 8690 file(s) from leanprover-community/mathlib4 cache at https://lakecache.blob.core.windows.net/mathlib4-master
+Decompressed 8690 file(s)
+Already decompressed 8690 file(s)
+✔ [8989/8992] Built BayesNashSecurityGames.Instance (97s)
+✔ [8990/8992] Built BayesNashSecurityGames.DefenderBR (99s)
+⚠ [8991/8992] Built BayesNashSecurityGames (9.2s)
+warning: BayesNashSecurityGames.lean:3:0: This file has no module docstring (`/-! ... -/`). Add one after the imports to document the file.
+
+Note: This linter can be disabled with `set_option linter.style.moduleDocstring false`
+Build completed successfully (8992 jobs).
+lake build  67.49s user 35.78s system 63% cpu 2:43.04 total
+exit=0
+
+# Rebuild after adding a module docstring to BayesNashSecurityGames.lean
+$ lake build
+✔ [8991/8992] Built BayesNashSecurityGames (8.7s)
+Build completed successfully (8992 jobs).
+exit=0

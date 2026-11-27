@@ -1,0 +1,2 @@
+rc=137
+# decide +kernel on both (2,4) sums in one file: killed (exit 137, likely OOM on the shared machine). Single sum (2,4)=9408 alone had succeeded in 9 min (not kept).

@@ -1,0 +1,11 @@
+# independent-checks/myenc.py + CaDiCaL (-q), rerun while assembling the repository; 1200 s limit per instance
+N=3 k=1 vars/clauses=46 65 s SATISFIABLE (0s)
+N=3 k=2 vars/clauses=46 71 s UNSATISFIABLE (1s)
+N=4 k=1 vars/clauses=217 371 s SATISFIABLE (0s)
+N=4 k=2 vars/clauses=217 407 s UNSATISFIABLE (0s)
+N=5 k=2 vars/clauses=791 1647 s SATISFIABLE (0s)
+N=5 k=3 vars/clauses=791 1687 s UNSATISFIABLE (0s)
+N=6 k=2 vars/clauses=2791 5987 s SATISFIABLE (0s)
+N=6 k=3 vars/clauses=2791 6317 s UNSATISFIABLE (0s)
+N=7 k=3 vars/clauses=10270 22997 TIMEOUT (1200s)
+# (7,3) was not rerun to completion here; the reviewing session reported UNSAT for it (see CHECKS.md).

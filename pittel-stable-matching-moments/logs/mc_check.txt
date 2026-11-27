@@ -1,0 +1,5 @@
+check n=3 m=4 trials=2000 OK
+check n=4 m=5 trials=2000 OK
+check n=5 m=6 trials=2000 OK
+check n=6 m=7 trials=2000 OK
+check n=6 m=6 trials=2000 OK

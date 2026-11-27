@@ -1,0 +1,2 @@
+python3 -I scripts/bne_enum.py 0 200 5 > logs/bne_enum_seed0.log 2>&1  237.30s user 1.06s system 39% cpu 10:05.79 total
+python3 -I scripts/bne_enum.py 1 150 1000 > logs/bne_enum_generic_seed1.log 2  102.97s user 9.34s system 12% cpu 14:44.53 total

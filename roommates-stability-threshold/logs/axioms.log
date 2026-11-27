@@ -1,0 +1,8 @@
+'RoommatesThreshold.stabilityThreshold_le_half' depends on axioms: [propext, Classical.choice, Quot.sound]
+'RoommatesThreshold.stabilityThreshold_mono' depends on axioms: [propext, Classical.choice, Quot.sound]
+'RoommatesThreshold.K3' depends on axioms: [propext, Classical.choice, Quot.sound]
+'RoommatesThreshold.K4' depends on axioms: [propext, Classical.choice, Quot.sound]
+'RoommatesThreshold.K5' depends on axioms: [propext, Classical.choice, Quot.sound]
+'RoommatesThreshold.K6' depends on axioms: [propext, Classical.choice, Quot.sound]
+'RoommatesThreshold.three_le_K' depends on axioms: [propext, Classical.choice, Quot.sound]
+'RoommatesThreshold.target_of_lowerBound' depends on axioms: [propext, Classical.choice, Quot.sound]

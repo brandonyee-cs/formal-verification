@@ -1,0 +1,1 @@
+timeout 7200 lake env lean ../lean/_N15.lean  321.65s user 52.95s system 31% cpu 19:57.31 total

@@ -1,0 +1,11 @@
+$ lake env lean Axioms.lean
+'CatchUpCert.conj_le_16' depends on axioms: [propext, Classical.choice, Quot.sound]
+'CatchUpCert.check_sound' depends on axioms: [propext, Classical.choice, Quot.sound]
+'CatchUpCert.valueAux_eq_D' depends on axioms: [propext, Classical.choice, Quot.sound]
+'CatchUpCert.value_eq_draw_of_cert' depends on axioms: [propext, Classical.choice, Quot.sound]
+'CatchUpOMA.conj_le_12' depends on axioms: [propext, Classical.choice, Quot.sound]
+'CatchUpOMA.valueAux_eq_ev' depends on axioms: [propext, Classical.choice, Quot.sound]
+'CatchUpOMA.value_ne_draw_of_odd' depends on axioms: [propext, Classical.choice, Quot.sound]
+'CatchUpOMA.valueAux_draw_even' depends on axioms: [propext, Classical.choice, Quot.sound]
+lake env lean Axioms.lean  5.33s user 2.56s system 101% cpu 7.799 total
+exit=0

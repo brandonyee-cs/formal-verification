@@ -1,0 +1,6 @@
+$ python3 -I independent-checks/brute_n2.py   # columns: m #profiles E[S] E[S^2] E==formula E2==formula, profiles where S != (2 if C else 1)
+2 16 9/8 11/8 True True mismatch 0
+3 288 25/24 9/8 True True mismatch 0
+4 9216 49/48 17/16 True True mismatch 0
+5 460800 81/80 83/80 True True mismatch 0
+# time: 9.48s user 0.01s system 99% cpu 9.519 total

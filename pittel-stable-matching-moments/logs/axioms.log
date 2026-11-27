@@ -1,0 +1,16 @@
+$ lake env lean Axioms.lean
+'PittelSmall.numStableMatchings_eq_countB' depends on axioms: [propext, Classical.choice, Quot.sound]
+'PittelSmall.expected_eq_sum' depends on axioms: [propext, Classical.choice, Quot.sound]
+'PittelSmall.secondMoment_eq_sum' depends on axioms: [propext, Classical.choice, Quot.sound]
+'PittelSmall.card_profile' depends on axioms: [propext, Classical.choice, Quot.sound]
+'PittelSmall.expected_2_2' depends on axioms: [propext, Classical.choice, Quot.sound]
+'PittelSmall.secondMoment_2_2' depends on axioms: [propext, Classical.choice, Quot.sound]
+'PittelSmall.expected_2_3' depends on axioms: [propext, Classical.choice, Quot.sound]
+'PittelSmall.secondMoment_2_3' depends on axioms: [propext, Classical.choice, Quot.sound]
+'PittelNTwo.countB_two' depends on axioms: [propext, Classical.choice, Quot.sound]
+'PittelNTwo.numStableMatchings_two' depends on axioms: [propext, Classical.choice, Quot.sound]
+'PittelNTwo.numStableMatchings_two_le' depends on axioms: [propext, Classical.choice, Quot.sound]
+'PittelNTwo.card_C_mul' depends on axioms: [propext, Classical.choice, Quot.sound]
+'PittelNTwo.expected_two' depends on axioms: [propext, Classical.choice, Quot.sound]
+'PittelNTwo.secondMoment_two' depends on axioms: [propext, Classical.choice, Quot.sound]
+exit=0

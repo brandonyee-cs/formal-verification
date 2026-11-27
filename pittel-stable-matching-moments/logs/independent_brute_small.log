@@ -1,0 +1,6 @@
+$ python3 -I independent-checks/brute_small.py   # columns: n m #profiles sum(S) sum(S^2) E[S] E[S^2]
+2 2 16 18 22 9/8 11/8
+2 3 288 300 324 25/24 9/8
+3 2 288 0 0 0 0
+3 3 46656 60324 89844 5027/3888 7487/3888
+# time: 0.70s user 0.00s system 99% cpu 0.711 total

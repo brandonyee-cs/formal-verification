@@ -1,0 +1,14 @@
+__pycache__/
+*.pyc
+lean/.lake/
+# compiled binaries
+scripts/cert
+scripts/solver
+scripts/solver2
+scripts/solver3
+scripts/treecount
+*.o
+*.out
+# raw certificate dumps written by scripts/gen_cert_lean.py
+certs/
+cert_*.txt

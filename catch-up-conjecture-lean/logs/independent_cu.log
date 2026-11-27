@@ -1,0 +1,14 @@
+$ python3 -I independent-checks/cu.py    # N, T_N even?, value (1 = P1 wins, 0 = draw, -1 = P2 wins)
+0 True 0
+1 False 1
+2 False 1
+3 True 0
+4 True 0
+5 False 1
+6 False 1
+7 True 0
+8 True 0
+9 False -1
+10 False -1
+11 True 0
+12 True 0

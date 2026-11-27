@@ -1,0 +1,11 @@
+$ lake env lean Axioms.lean
+'OMA.BNSG.pairwise_iff_optimal' depends on axioms: [propext, Classical.choice, Quot.sound]
+'OMA.BNSG.isBayesNash_mkOutput_iff_optimal' depends on axioms: [propext, Classical.choice, Quot.sound]
+'OMA.BNSG.eq_mkOutput_of_isBayesNash' depends on axioms: [propext, Classical.choice, Quot.sound]
+'OMA.BNSG.isBayesNash_iff_optimal' depends on axioms: [propext, Classical.choice, Quot.sound]
+'OMA.BNSG.exists_isBayesNash_of_zero' depends on axioms: [propext, Classical.choice, Quot.sound]
+'OMA.BNSG.exists_isBayesNash_of_full' depends on axioms: [propext, Classical.choice, Quot.sound]
+'OMA.BNSG.g₀_valid' depends on axioms: [propext, Classical.choice, Quot.sound]
+'OMA.BNSG.instance_isBayesNash_family' depends on axioms: [propext, Classical.choice, Quot.sound]
+'OMA.BNSG.instance_isBayesNash' depends on axioms: [propext, Classical.choice, Quot.sound]
+exit=0

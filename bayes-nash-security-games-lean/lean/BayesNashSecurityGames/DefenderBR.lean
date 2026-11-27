@@ -1,0 +1,237 @@
+import FormalConjectures.Arxiv.«2610.08796».BayesianSecurityGames
+
+/-!
+# Side results for `Arxiv.2610.08796.exists_isPolyTime_bayesNash`
+
+None of these touch the polynomial-time part of the target.
+
+1. `pairwise_iff_optimal`: the pairwise "no profitable shift" clause used in `IsBayesNash` for the
+   defender is equivalent to global optimality of the coverage vector over the whole marginal
+   polytope `{c | 0 ≤ c ≤ 1, ∑ c = r}` for the linear objective `∑ gain t * c t`.
+   (Faithfulness lemma for the formalization.)
+2. Zero resources / full resources: existence of a Bayes–Nash equilibrium in the exact
+   sense of `GameInput.IsBayesNash` when `r = 0` or `r = numTargets`.
+-/
+
+open Finset
+
+namespace OMA.BNSG
+
+variable {n : ℕ}
+
+/-- Feasible coverage marginals. -/
+def Feasible (r : ℚ) (c : Fin n → ℚ) : Prop :=
+  (∀ t, 0 ≤ c t ∧ c t ≤ 1) ∧ ∑ t, c t = r
+
+/-- The pairwise exchange condition of `IsBayesNash` is equivalent to LP optimality
+over the marginal polytope. -/
+theorem pairwise_iff_optimal (r : ℚ) (c g : Fin n → ℚ) (hc : Feasible r c) :
+    (∀ t s, 0 < c t → c s < 1 → g s ≤ g t) ↔
+      ∀ c', Feasible r c' → ∑ t, g t * c' t ≤ ∑ t, g t * c t := by
+  constructor
+  · intro h c' hc'
+    -- threshold `lam`: below every gain on the support of `c`, above every gain off `{c = 1}`
+    classical
+    set S := univ.filter (fun t => 0 < c t) with hS
+    have key : ∃ lam : ℚ, (∀ t, c t < c' t → g t ≤ lam) ∧ (∀ t, c' t < c t → lam ≤ g t) := by
+      by_cases hne : S.Nonempty
+      · refine ⟨S.inf' hne g, ?_, ?_⟩
+        · intro t ht
+          refine (le_inf'_iff hne g).2 ?_
+          intro s hs
+          have hs' : 0 < c s := by simpa [hS] using hs
+          exact h s t hs' (lt_of_lt_of_le ht (hc'.1 t).2)
+        · intro t ht
+          refine inf'_le _ ?_
+          have : 0 < c t := lt_of_le_of_lt (hc'.1 t).1 ht
+          simp [hS, this]
+      · refine ⟨∑ t, |g t|, ?_, ?_⟩
+        · intro t _
+          exact (le_abs_self _).trans
+            (single_le_sum (f := fun t => |g t|) (fun _ _ => abs_nonneg _) (mem_univ t))
+        · intro t ht
+          exfalso; apply hne
+          exact ⟨t, by simp [hS]; exact lt_of_le_of_lt (hc'.1 t).1 ht⟩
+    obtain ⟨lam, h1, h2⟩ := key
+    have hterm : ∀ t, (g t - lam) * (c' t - c t) ≤ 0 := by
+      intro t
+      rcases lt_trichotomy (c t) (c' t) with hlt | heq | hgt
+      · exact mul_nonpos_of_nonpos_of_nonneg (by linarith [h1 t hlt]) (by linarith)
+      · simp [heq]
+      · exact mul_nonpos_of_nonneg_of_nonpos (by linarith [h2 t hgt]) (by linarith)
+    have hsum : ∑ t, (g t - lam) * (c' t - c t) ≤ 0 := sum_nonpos (fun t _ => hterm t)
+    have hexp : ∑ t, (g t - lam) * (c' t - c t) =
+        (∑ t, g t * c' t - ∑ t, g t * c t) - lam * (∑ t, c' t - ∑ t, c t) := by
+      simp only [mul_sub, sub_mul, sum_sub_distrib, mul_sum]
+      ring
+    rw [hexp, hc'.2, hc.2, sub_self, mul_zero, sub_zero] at hsum
+    linarith
+  · intro h t s ht hs
+    by_contra hlt
+    rw [not_le] at hlt
+    have hts : t ≠ s := by rintro rfl; exact lt_irrefl _ hlt
+    set ε := min (c t) (1 - c s) with hε
+    have hεpos : 0 < ε := lt_min ht (by linarith)
+    have hεt : ε ≤ c t := min_le_left _ _
+    have hεs : ε ≤ 1 - c s := min_le_right _ _
+    let c' : Fin n → ℚ := fun u => c u - (if u = t then ε else 0) + (if u = s then ε else 0)
+    have hfeas : Feasible r c' := by
+      refine ⟨fun u => ?_, ?_⟩
+      · obtain ⟨h0, h1⟩ := hc.1 u
+        by_cases hut : u = t
+        · subst hut; simp [c', hts]; constructor <;> linarith
+        · by_cases hus : u = s
+          · subst hus; simp [c', hut]; constructor <;> linarith
+          · simp [c', hut, hus]; exact ⟨h0, h1⟩
+      · simp only [c', sum_add_distrib, sum_sub_distrib, sum_ite_eq', mem_univ, if_true, hc.2]
+        ring
+    have := h c' hfeas
+    have hval : ∑ u, g u * c' u = ∑ u, g u * c u + ε * (g s - g t) := by
+      simp only [c', mul_add, mul_sub, sum_add_distrib, sum_sub_distrib, mul_ite, mul_zero,
+        sum_ite_eq', mem_univ, if_true]
+      ring
+    rw [hval] at this
+    have : 0 < ε * (g s - g t) := mul_pos hεpos (by linarith)
+    linarith
+
+
+open Arxiv.«2610.08796»
+
+theorem getD_ofFn {m : ℕ} (f : Fin m → ℚ) (i : Fin m) : (List.ofFn f)[i.val]?.getD 0 = f i := by
+  simp
+
+theorem getD_ofFn' {m k : ℕ} (f : Fin m → Fin k → ℚ) (i : Fin m) :
+    (List.ofFn fun j => List.ofFn (f j))[i.val]?.getD [] = List.ofFn (f i) := by
+  simp
+
+/-- The output built from a coverage function `c` and attack functions `a`. -/
+def mkOutput (g : GameInput) (c : Fin g.numTargets → ℚ)
+    (a : Fin g.numTypes → Fin g.numTargets → ℚ) : EquilibriumOutput :=
+  (List.ofFn c, List.ofFn fun θ => List.ofFn (a θ))
+
+/-- Attacker expected utility of type `θ` at target `t` under coverage `c`. -/
+def attU (g : GameInput) (c : Fin g.numTargets → ℚ) (θ : Fin g.numTypes)
+    (t : Fin g.numTargets) : ℚ :=
+  (1 - c t) * (g.attackerPayoff θ t).1 + c t * (g.attackerPayoff θ t).2
+
+/-- Defender's marginal gain from covering `t`. -/
+def gain (g : GameInput) (a : Fin g.numTypes → Fin g.numTargets → ℚ) (t : Fin g.numTargets) : ℚ :=
+  (∑ θ, g.prior θ * a θ t) * ((g.defenderPayoff t).2 - (g.defenderPayoff t).1)
+
+/-- Defender's expected utility of coverage `c'` against the type-contingent attack `a`. -/
+def defU (g : GameInput) (a : Fin g.numTypes → Fin g.numTargets → ℚ)
+    (c' : Fin g.numTargets → ℚ) : ℚ :=
+  ∑ θ, g.prior θ * ∑ t, a θ t *
+    ((1 - c' t) * (g.defenderPayoff t).1 + c' t * (g.defenderPayoff t).2)
+
+theorem isBayesNash_mkOutput_iff (g : GameInput) (c : Fin g.numTargets → ℚ)
+    (a : Fin g.numTypes → Fin g.numTargets → ℚ) :
+    g.IsBayesNash (mkOutput g c a) ↔
+    ((∑ t, c t = g.1) ∧ (∀ t, 0 ≤ c t ∧ c t ≤ 1) ∧ (∀ θ, ∑ t, a θ t = 1 ∧ ∀ t, 0 ≤ a θ t) ∧
+     (∀ θ t s, 0 < a θ t → attU g c θ s ≤ attU g c θ t) ∧
+     (∀ t s, 0 < c t → c s < 1 → gain g a s ≤ gain g a t)) := by
+  unfold GameInput.IsBayesNash mkOutput attU gain
+  dsimp only
+  simp only [getD_ofFn, getD_ofFn', List.length_ofFn, true_and]
+
+theorem defU_eq (g : GameInput) (a : Fin g.numTypes → Fin g.numTargets → ℚ)
+    (c' : Fin g.numTargets → ℚ) :
+    defU g a c' = defU g a 0 + ∑ t, gain g a t * c' t := by
+  have hg : ∑ t, gain g a t * c' t = ∑ θ, ∑ t, g.prior θ * a θ t *
+      ((g.defenderPayoff t).2 - (g.defenderPayoff t).1) * c' t := by
+    unfold gain; simp_rw [sum_mul]; exact sum_comm
+  rw [hg]; unfold defU; rw [← sum_add_distrib]
+  refine sum_congr rfl fun θ _ => ?_
+  rw [mul_sum, mul_sum, ← sum_add_distrib]
+  refine sum_congr rfl fun t _ => ?_
+  simp only [Pi.zero_apply]
+  ring
+
+/-- **Faithfulness of `IsBayesNash`.** For outputs of the canonical shape, `IsBayesNash` says
+exactly: valid marginals, valid mixed attacks, every type attacks only best responses, and the
+defender's coverage maximizes her expected utility over *all* feasible coverage marginals. -/
+theorem isBayesNash_mkOutput_iff_optimal (g : GameInput) (c : Fin g.numTargets → ℚ)
+    (a : Fin g.numTypes → Fin g.numTargets → ℚ) :
+    g.IsBayesNash (mkOutput g c a) ↔
+    (Feasible (g.1 : ℚ) c ∧ (∀ θ, ∑ t, a θ t = 1 ∧ ∀ t, 0 ≤ a θ t) ∧
+     (∀ θ t s, 0 < a θ t → attU g c θ s ≤ attU g c θ t) ∧
+     (∀ c', Feasible (g.1 : ℚ) c' → defU g a c' ≤ defU g a c)) := by
+  rw [isBayesNash_mkOutput_iff]
+  constructor
+  · rintro ⟨h1, h2, h3, h4, h5⟩
+    have hf : Feasible (g.1 : ℚ) c := ⟨h2, h1⟩
+    refine ⟨hf, h3, h4, fun c' hc' => ?_⟩
+    rw [defU_eq g a c', defU_eq g a c]
+    have := (pairwise_iff_optimal _ c (gain g a) hf).1 h5 c' hc'
+    linarith
+  · rintro ⟨hf, h3, h4, h5⟩
+    refine ⟨hf.2, hf.1, h3, h4, ?_⟩
+    refine (pairwise_iff_optimal _ c (gain g a) hf).2 fun c' hc' => ?_
+    have := h5 c' hc'
+    rw [defU_eq g a c', defU_eq g a c] at this
+    linarith
+
+/-- Every Bayes–Nash output has the canonical shape `mkOutput g c a`
+(adapted from the independent reviewer's scratch proof; uses the length clauses). -/
+theorem eq_mkOutput_of_isBayesNash (g : GameInput) (e : EquilibriumOutput)
+    (h : g.IsBayesNash e) : ∃ c a, e = mkOutput g c a := by
+  obtain ⟨h1, h2, -, -, h5, -⟩ := h
+  refine ⟨fun t => e.1[t.val]?.getD 0, fun θ t => (e.2[θ.val]?.getD [])[t.val]?.getD 0, ?_⟩
+  obtain ⟨l, m⟩ := e
+  simp only [mkOutput, Prod.mk.injEq]
+  constructor
+  · apply List.ext_getElem <;> simp_all
+  · apply List.ext_getElem
+    · simp_all
+    · intro i hi hi'
+      simp at hi'
+      have := (h5 ⟨i, by simp_all⟩).1
+      apply List.ext_getElem <;> simp_all
+
+/-- **Faithfulness of `IsBayesNash`, for arbitrary outputs.** -/
+theorem isBayesNash_iff_optimal (g : GameInput) (e : EquilibriumOutput) :
+    g.IsBayesNash e ↔ ∃ c a, e = mkOutput g c a ∧
+      (Feasible (g.1 : ℚ) c ∧ (∀ θ, ∑ t, a θ t = 1 ∧ ∀ t, 0 ≤ a θ t) ∧
+       (∀ θ t s, 0 < a θ t → attU g c θ s ≤ attU g c θ t) ∧
+       (∀ c', Feasible (g.1 : ℚ) c' → defU g a c' ≤ defU g a c)) := by
+  constructor
+  · intro h
+    obtain ⟨c, a, rfl⟩ := eq_mkOutput_of_isBayesNash g e h
+    exact ⟨c, a, rfl, (isBayesNash_mkOutput_iff_optimal g c a).1 h⟩
+  · rintro ⟨c, a, rfl, h⟩
+    exact (isBayesNash_mkOutput_iff_optimal g c a).2 h
+
+/-- Pure best response for a type against coverage `c` (exists since there is a target). -/
+theorem exists_best (g : GameInput) (hg : g.Valid) (c : Fin g.numTargets → ℚ)
+    (θ : Fin g.numTypes) : ∃ b, ∀ s, attU g c θ s ≤ attU g c θ b := by
+  have hne : (univ : Finset (Fin g.numTargets)).Nonempty := ⟨⟨0, hg.1⟩, mem_univ _⟩
+  obtain ⟨b, -, hb⟩ := exists_max_image univ (attU g c θ) hne
+  exact ⟨b, fun s => hb s (mem_univ s)⟩
+
+/-- Given coverage `c`, the pure best-response attack satisfies the attacker clauses. -/
+theorem attacker_clauses (g : GameInput) (hg : g.Valid) (c : Fin g.numTargets → ℚ) :
+    ∃ a : Fin g.numTypes → Fin g.numTargets → ℚ,
+      (∀ θ, ∑ t, a θ t = 1 ∧ ∀ t, 0 ≤ a θ t) ∧
+      (∀ θ t s, 0 < a θ t → attU g c θ s ≤ attU g c θ t) := by
+  choose b hb using exists_best g hg c
+  refine ⟨fun θ t => if t = b θ then 1 else 0, fun θ => ⟨by simp, fun t => by dsimp only; split_ifs <;> norm_num⟩,
+    fun θ t s ht => ?_⟩
+  by_cases h : t = b θ
+  · subst h; exact hb θ s
+  · simp [h] at ht
+
+/-- **Special case `r = 0`**: a Bayes–Nash equilibrium (in the exact sense of the target) exists. -/
+theorem exists_isBayesNash_of_zero (g : GameInput) (hg : g.Valid) (h0 : g.1 = 0) :
+    ∃ e, g.IsBayesNash e := by
+  obtain ⟨a, ha1, ha2⟩ := attacker_clauses g hg 0
+  refine ⟨mkOutput g 0 a, (isBayesNash_mkOutput_iff g 0 a).2 ⟨by simp [h0], fun t => by simp,
+    ha1, ha2, fun t s ht _ => by simp at ht⟩⟩
+
+/-- **Special case `r = numTargets`**: a Bayes–Nash equilibrium exists. -/
+theorem exists_isBayesNash_of_full (g : GameInput) (hg : g.Valid) (h0 : g.1 = g.numTargets) :
+    ∃ e, g.IsBayesNash e := by
+  obtain ⟨a, ha1, ha2⟩ := attacker_clauses g hg (fun _ => 1)
+  refine ⟨mkOutput g (fun _ => 1) a, (isBayesNash_mkOutput_iff g _ a).2 ⟨by simp [h0],
+    fun t => by simp, ha1, ha2, fun t s _ hs => by simp at hs⟩⟩
+
+end OMA.BNSG
